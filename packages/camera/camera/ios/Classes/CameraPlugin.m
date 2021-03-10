@@ -953,15 +953,23 @@ NSString *const errorMethod = @"error";
     return;
   }
   _focusMode = mode;
-  [self applyFocusMode];
-  result(nil);
+    @try {
+        [self applyFocusMode];
+        result(nil);
+    } @catch (NSError *e) {
+      result(getFlutterError(e));
+      return;
+    }
+
 }
 
 - (void)applyFocusMode {
   [_captureDevice lockForConfiguration:nil];
   switch (_focusMode) {
     case FocusModeLocked:
-      [_captureDevice setFocusMode:AVCaptureFocusModeAutoFocus];
+          if ([_captureDevice isFocusModeSupported:AVCaptureFocusModeAutoFocus]) {
+              [_captureDevice setFocusMode:AVCaptureFocusModeAutoFocus];
+          }
       break;
     case FocusModeAuto:
       if ([_captureDevice isFocusModeSupported:AVCaptureFocusModeContinuousAutoFocus]) {

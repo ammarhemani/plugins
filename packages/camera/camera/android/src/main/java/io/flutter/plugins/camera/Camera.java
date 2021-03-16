@@ -49,6 +49,7 @@ import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugins.camera.PictureCaptureRequest.State;
 import io.flutter.plugins.camera.media.MediaRecorderBuilder;
 import io.flutter.plugins.camera.types.ExposureMode;
+import io.flutter.plugins.camera.types.WhiteBalanceMode;
 import io.flutter.plugins.camera.types.FlashMode;
 import io.flutter.plugins.camera.types.FocusMode;
 import io.flutter.plugins.camera.types.ResolutionPreset;
@@ -98,6 +99,7 @@ public class Camera {
   private File videoRecordingFile;
   private FlashMode flashMode;
   private ExposureMode exposureMode;
+  private WhiteBalanceMode whiteBalanceMode;
   private FocusMode focusMode;
   private PictureCaptureRequest pictureCaptureRequest;
   private CameraRegions cameraRegions;
@@ -133,6 +135,7 @@ public class Camera {
     this.applicationContext = activity.getApplicationContext();
     this.flashMode = FlashMode.auto;
     this.exposureMode = ExposureMode.auto;
+    this.whiteBalanceMode = WhiteBalanceMode.autoWhiteBalance;
     this.focusMode = FocusMode.auto;
     this.exposureOffset = 0;
 
@@ -221,7 +224,8 @@ public class Camera {
                   previewSize.getWidth(),
                   previewSize.getHeight(),
                   exposureMode,
-                  focusMode,
+                      whiteBalanceMode,
+                      focusMode,
                   isExposurePointSupported(),
                   isFocusPointSupported());
             } catch (CameraAccessException e) {
@@ -771,6 +775,13 @@ public class Camera {
     result.success(null);
   }
 
+  public void setWhiteBalanceMode(@NonNull final Result result, WhiteBalanceMode mode)
+          throws CameraAccessException {
+    updateWhiteBalance(mode);
+    cameraCaptureSession.setRepeatingRequest(captureRequestBuilder.build(), null, null);
+    result.success(null);
+  }
+
   public void setExposurePoint(@NonNull final Result result, Double x, Double y)
       throws CameraAccessException {
     // Check if exposure point functionality is available.
@@ -1046,6 +1057,22 @@ public class Camera {
     }
 
     captureRequestBuilder.set(CaptureRequest.CONTROL_AE_EXPOSURE_COMPENSATION, exposureOffset);
+  }
+
+  private void updateWhiteBalance(WhiteBalanceMode mode) {
+    whiteBalanceMode = mode;
+
+    switch (mode) {
+      case locked:
+        captureRequestBuilder.set(CaptureRequest.CONTROL_AWB_MODE, CaptureRequest.CONTROL_AWB_STATE_LOCKED);
+        break;
+      case autoWhiteBalance:
+        captureRequestBuilder.set(CaptureRequest.CONTROL_AWB_MODE, CaptureRequest.CONTROL_AWB_MODE_AUTO);
+        break;
+      default:
+        captureRequestBuilder.set(CaptureRequest.CONTROL_AWB_MODE, CaptureRequest.CONTROL_AWB_MODE_OFF);
+        break;
+    }
   }
 
   private void updateFlash(FlashMode mode) {

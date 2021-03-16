@@ -1,8 +1,13 @@
+/// The possible compression modes that can be set for a camera.
 enum CompressMode {
+  /// Compressed
   compressed,
+
+  /// Uncompressed
   uncompressed,
 }
 
+/// Returns the compression mode as a String.
 String serializeCompressMode(CompressMode compressMode) {
   if (compressMode == null) return null;
   switch (compressMode) {
@@ -15,6 +20,7 @@ String serializeCompressMode(CompressMode compressMode) {
   }
 }
 
+/// Returns the compression mode for a given String.
 CompressMode deserializeCompressMode(String str) {
   if (str == null) return null;
   switch (str) {

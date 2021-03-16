@@ -176,6 +176,21 @@ final class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
           }
           break;
         }
+      case "setWhiteBalanceMode":
+      {
+        String modeStr = call.argument("mode");
+        WhiteBalanceMode mode = WhiteBalanceMode.getValueForString(modeStr);
+        if (mode == null) {
+          result.error("setWhiteBalanceModeFailed", "Unknown WhiteBalance mode " + modeStr, null);
+          return;
+        }
+        try {
+          camera.setWhiteBalanceMode(result, mode);
+        } catch (Exception e) {
+          handleException(e, result);
+        }
+        break;
+      }
       case "getMinExposureOffset":
         {
           try {

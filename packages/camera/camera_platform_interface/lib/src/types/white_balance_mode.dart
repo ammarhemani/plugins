@@ -1,9 +1,7 @@
-enum WhiteBalanceMode {
-  locked,
-  autoWhiteBalance,
-  continuousAutoWhiteBalance
-}
+/// The possible white balance modes that can be set for a camera.
+enum WhiteBalanceMode { locked, autoWhiteBalance, continuousAutoWhiteBalance }
 
+/// Returns the white balance mode as a String.
 String serializeWhiteBalanceMode(WhiteBalanceMode whiteBalanceMode) {
   if (whiteBalanceMode == null) return null;
   switch (whiteBalanceMode) {
@@ -18,6 +16,7 @@ String serializeWhiteBalanceMode(WhiteBalanceMode whiteBalanceMode) {
   }
 }
 
+/// Returns the white balance mode for a given String.
 WhiteBalanceMode deserializeWhiteBalanceMode(String str) {
   if (str == null) return null;
   switch (str) {

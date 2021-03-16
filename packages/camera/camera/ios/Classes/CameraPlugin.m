@@ -944,6 +944,77 @@ NSString *const errorMethod = @"error";
   [_captureDevice unlockForConfiguration];
 }
 
+static NSString *getStringForWhiteBalanceMode(WhiteBalanceMode mode) {
+  switch (mode) {
+    case WhiteBalanceModeAutoWhiteBalance:
+      return @"autoWhiteBalance";
+    case WhiteBalanceLocked:
+      return @"locked";
+    case WhiteBalanceContinuousWhiteBalance:
+      return @"continuousAutoWhiteBalance";
+  }
+  NSError *error = [NSError errorWithDomain:NSCocoaErrorDomain
+                                       code:NSURLErrorUnknown
+                                   userInfo:@{
+                                     NSLocalizedDescriptionKey : [NSString
+                                         stringWithFormat:@"Unknown string for white balance mode"]
+                                   }];
+  @throw error;
+}
+
+static WhiteBalanceMode getWhiteBalanceModeForString(NSString *mode) {
+  if ([mode isEqualToString:@"autoWhiteBalance"]) {
+    return WhiteBalanceModeAutoWhiteBalance;
+  } else if ([mode isEqualToString:@"locked"]) {
+    return WhiteBalanceLocked;
+  } else if ([mode isEqualToString:@"continuousAutoWhiteBalance"]) {
+    return WhiteBalanceContinuousWhiteBalance;
+  } else {
+    NSError *error = [NSError errorWithDomain:NSCocoaErrorDomain
+                                         code:NSURLErrorUnknown
+                                     userInfo:@{
+                                       NSLocalizedDescriptionKey : [NSString
+                                           stringWithFormat:@"Unknown white balance mode %@", mode]
+                                     }];
+    @throw error;
+  }
+}
+
+- (void)setWhiteBalanceModeWithResult:(FlutterResult)result mode:(NSString *)modeStr {
+    WhiteBalanceMode mode;
+    @try {
+        mode = getWhiteBalanceModeForString(modeStr);
+    } @catch (NSError *e) {
+        result(getFlutterError(e));
+        return;
+    }
+    _whiteBalanceMode = mode;
+    [self applyWhiteBalanceMode];
+    result(nil);
+}
+
+- (void)applyWhiteBalanceMode {
+    [_captureDevice lockForConfiguration:nil];
+    switch (_whiteBalanceMode) {
+        case WhiteBalanceLocked:
+            if ([_captureDevice isWhiteBalanceModeSupported: AVCaptureWhiteBalanceModeLocked]) {
+                [_captureDevice setWhiteBalanceMode:AVCaptureWhiteBalanceModeLocked];
+            }
+            break;
+        case WhiteBalanceModeAutoWhiteBalance:
+            if ([_captureDevice isWhiteBalanceModeSupported: AVCaptureWhiteBalanceModeAutoWhiteBalance]) {
+                [_captureDevice setWhiteBalanceMode:AVCaptureWhiteBalanceModeAutoWhiteBalance];
+            }
+            break;
+        case WhiteBalanceContinuousWhiteBalance:
+            if ([_captureDevice isWhiteBalanceModeSupported: AVCaptureWhiteBalanceModeContinuousAutoWhiteBalance]) {
+                [_captureDevice setWhiteBalanceMode:AVCaptureWhiteBalanceModeContinuousAutoWhiteBalance];
+            }
+            break;
+    }
+    [_captureDevice unlockForConfiguration];
+}
+
 - (void)setFocusModeWithResult:(FlutterResult)result mode:(NSString *)modeStr {
   FocusMode mode;
   @try {
@@ -1411,6 +1482,8 @@ NSString *const errorMethod = @"error";
       [_camera setFlashModeWithResult:result mode:call.arguments[@"mode"]];
     } else if ([@"setExposureMode" isEqualToString:call.method]) {
       [_camera setExposureModeWithResult:result mode:call.arguments[@"mode"]];
+    } else if ([@"setWhiteBalanceMode" isEqualToString:call.method]) {
+                 [_camera setWhiteBalanceModeWithResult:result mode:call.arguments[@"mode"]];
     } else if ([@"setExposurePoint" isEqualToString:call.method]) {
       BOOL reset = ((NSNumber *)call.arguments[@"reset"]).boolValue;
       double x = 0.5;

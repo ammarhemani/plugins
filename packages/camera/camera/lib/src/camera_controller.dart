@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:camera/camera.dart';
@@ -416,7 +417,7 @@ class CameraController extends ValueNotifier<CameraValue> {
   ///
   /// The video is returned as a [XFile] after calling [stopVideoRecording].
   /// Throws a [CameraException] if the capture fails.
-  Future<void> startVideoRecording() async {
+  Future<void> startVideoRecording({CompressMode mode}) async {
     _throwIfNotInitialized("startVideoRecording");
     if (value.isRecordingVideo) {
       throw CameraException(
@@ -432,7 +433,11 @@ class CameraController extends ValueNotifier<CameraValue> {
     }
 
     try {
-      await CameraPlatform.instance.startVideoRecording(_cameraId);
+      if (Platform.isAndroid) {
+        await CameraPlatform.instance.startVideoRecording(_cameraId);
+      } else {
+        await CameraPlatform.instance.startVideoRecording(_cameraId, mode: mode);
+      }
       value = value.copyWith(
           isRecordingVideo: true,
           isRecordingPaused: false,

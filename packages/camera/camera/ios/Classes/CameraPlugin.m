@@ -791,31 +791,47 @@ NSString *const errorMethod = @"error";
   return pixelBuffer;
 }
 
-- (void)startVideoRecordingWithResult:(FlutterResult)result {
-  if (!_isRecording) {
-    NSError *error;
-    _videoRecordingPath = [self getTemporaryFilePathWithExtension:@"mp4"
-                                                        subfolder:@"videos"
-                                                           prefix:@"REC_"
-                                                            error:error];
-    if (error) {
-      result(getFlutterError(error));
-      return;
+- (void)startVideoRecordingWithResult:(FlutterResult)result mode:(NSString *)compressed{
+    if (!_isRecording) {
+        NSError *error;
+        if ([compressed isEqualToString:@"compressed"]){
+            _videoRecordingPath = [self getTemporaryFilePathWithExtension:@"mp4"
+                                                                subfolder:@"videos"
+                                                                   prefix:@"REC_"
+                                                                    error:error];
+        }
+        else {
+            _videoRecordingPath = [self getTemporaryFilePathWithExtension:@"mov"
+                                                                subfolder:@"videos"
+                                                                   prefix:@"REC_"
+                                                                    error:error];
+        }
+
+        if (error) {
+            result(getFlutterError(error));
+            return;
+        }
+
+        BOOL isCompressed = NO;
+        if ([compressed isEqualToString:@"compressed"])
+        {
+            isCompressed = YES;
+        }
+
+        if (![self setupWriterForPath:_videoRecordingPath isCompressed:isCompressed]) {
+            result([FlutterError errorWithCode:@"IOError" message:@"Setup Writer Failed" details:nil]);
+            return;
+        }
+        _isRecording = YES;
+        _isRecordingPaused = NO;
+        _videoTimeOffset = CMTimeMake(0, 1);
+        _audioTimeOffset = CMTimeMake(0, 1);
+        _videoIsDisconnected = NO;
+        _audioIsDisconnected = NO;
+        result(nil);
+    } else {
+        result([FlutterError errorWithCode:@"Error" message:@"Video is already recording" details:nil]);
     }
-    if (![self setupWriterForPath:_videoRecordingPath]) {
-      result([FlutterError errorWithCode:@"IOError" message:@"Setup Writer Failed" details:nil]);
-      return;
-    }
-    _isRecording = YES;
-    _isRecordingPaused = NO;
-    _videoTimeOffset = CMTimeMake(0, 1);
-    _audioTimeOffset = CMTimeMake(0, 1);
-    _videoIsDisconnected = NO;
-    _audioIsDisconnected = NO;
-    result(nil);
-  } else {
-    result([FlutterError errorWithCode:@"Error" message:@"Video is already recording" details:nil]);
-  }
 }
 
 - (void)stopVideoRecordingWithResult:(FlutterResult)result {
@@ -1474,7 +1490,7 @@ static WhiteBalanceMode getWhiteBalanceModeForString(NSString *mode) {
       [_camera setUpCaptureSessionForAudio];
       result(nil);
     } else if ([@"startVideoRecording" isEqualToString:call.method]) {
-      [_camera startVideoRecordingWithResult:result];
+      [_camera startVideoRecordingWithResult:result mode:call.arguments[@"mode"]];
     } else if ([@"stopVideoRecording" isEqualToString:call.method]) {
       [_camera stopVideoRecordingWithResult:result];
     } else if ([@"pauseVideoRecording" isEqualToString:call.method]) {

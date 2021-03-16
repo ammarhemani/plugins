@@ -1194,82 +1194,167 @@ static WhiteBalanceMode getWhiteBalanceModeForString(NSString *mode) {
   }
 }
 
-- (BOOL)setupWriterForPath:(NSString *)path {
-  NSError *error = nil;
-  NSURL *outputURL;
-  if (path != nil) {
-    outputURL = [NSURL fileURLWithPath:path];
-  } else {
-    return NO;
-  }
-  if (_enableAudio && !_isAudioSetup) {
-    [self setUpCaptureSessionForAudio];
-  }
-  _videoWriter = [[AVAssetWriter alloc] initWithURL:outputURL
-                                           fileType:AVFileTypeMPEG4
-                                              error:&error];
-  NSParameterAssert(_videoWriter);
-  if (error) {
-    [_methodChannel invokeMethod:errorMethod arguments:error.description];
-    return NO;
-  }
-  NSDictionary *videoSettings = [NSDictionary
-      dictionaryWithObjectsAndKeys:AVVideoCodecH264, AVVideoCodecKey,
-                                   [NSNumber numberWithInt:_previewSize.width], AVVideoWidthKey,
-                                   [NSNumber numberWithInt:_previewSize.height], AVVideoHeightKey,
-                                   nil];
-  _videoWriterInput = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeVideo
-                                                         outputSettings:videoSettings];
+- (BOOL)setupWriterForPath:(NSString *)path isCompressed:(BOOL)isCompressed{
 
-  _videoAdaptor = [AVAssetWriterInputPixelBufferAdaptor
-      assetWriterInputPixelBufferAdaptorWithAssetWriterInput:_videoWriterInput
-                                 sourcePixelBufferAttributes:@{
-                                   (NSString *)kCVPixelBufferPixelFormatTypeKey : @(videoFormat)
-                                 }];
+    NSError *error = nil;
+    NSURL *outputURL;
+    if (path != nil) {
+        outputURL = [NSURL fileURLWithPath:path];
+    } else {
+        return NO;
+    }
+    if (_enableAudio && !_isAudioSetup) {
+        [self setUpCaptureSessionForAudio];
+    }
+    if(isCompressed) {
+        _videoWriter = [[AVAssetWriter alloc] initWithURL:outputURL
+                                                 fileType:AVFileTypeMPEG4
+                                                    error:&error];
+    }
+    else {
+        _videoWriter = [[AVAssetWriter alloc] initWithURL:outputURL
+                                                 fileType:AVFileTypeQuickTimeMovie
+                                                    error:&error];
+    }
+    NSParameterAssert(_videoWriter);
+    if (error) {
+        [_methodChannel invokeMethod:errorMethod arguments:error.description];
+        return NO;
+    }
+    NSDictionary *videoSettings;
 
-  NSParameterAssert(_videoWriterInput);
-  CGFloat rotationDegrees;
-  if (_lockedCaptureOrientation != UIDeviceOrientationUnknown) {
-    rotationDegrees = [self getRotationFromDeviceOrientation:_lockedCaptureOrientation];
-  } else {
-    rotationDegrees = [self getRotationFromDeviceOrientation:[UIDevice currentDevice].orientation];
-  }
+    if(isCompressed) {
+        videoSettings = [NSDictionary
+                           dictionaryWithObjectsAndKeys:AVVideoCodecTypeH264, AVVideoCodecKey,
+                           [NSNumber numberWithInt:_previewSize.width], AVVideoWidthKey,
+                           [NSNumber numberWithInt:_previewSize.height], AVVideoHeightKey,
+                           nil];
 
-  _videoWriterInput.transform = CGAffineTransformMakeRotation(rotationDegrees * M_PI / 180);
-  _videoWriterInput.expectsMediaDataInRealTime = YES;
+        _videoWriterInput = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeVideo
+                                                                   outputSettings:videoSettings];
 
-  // Add the audio input
-  if (_enableAudio) {
-    AudioChannelLayout acl;
-    bzero(&acl, sizeof(acl));
-    acl.mChannelLayoutTag = kAudioChannelLayoutTag_Mono;
-    NSDictionary *audioOutputSettings = nil;
-    // Both type of audio inputs causes output video file to be corrupted.
-    audioOutputSettings = [NSDictionary
-        dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:kAudioFormatMPEG4AAC], AVFormatIDKey,
-                                     [NSNumber numberWithFloat:44100.0], AVSampleRateKey,
-                                     [NSNumber numberWithInt:1], AVNumberOfChannelsKey,
-                                     [NSData dataWithBytes:&acl length:sizeof(acl)],
-                                     AVChannelLayoutKey, nil];
-    _audioWriterInput = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeAudio
-                                                           outputSettings:audioOutputSettings];
-    _audioWriterInput.expectsMediaDataInRealTime = YES;
 
-    [_videoWriter addInput:_audioWriterInput];
-    [_audioOutput setSampleBufferDelegate:self queue:_dispatchQueue];
-  }
+        _videoAdaptor = [AVAssetWriterInputPixelBufferAdaptor
+                         assetWriterInputPixelBufferAdaptorWithAssetWriterInput:_videoWriterInput
+                         sourcePixelBufferAttributes:@{
+                             (NSString *)kCVPixelBufferPixelFormatTypeKey : @(videoFormat)
+                         }];
 
-  if (_flashMode == FlashModeTorch) {
-    [self.captureDevice lockForConfiguration:nil];
-    [self.captureDevice setTorchMode:AVCaptureTorchModeOn];
-    [self.captureDevice unlockForConfiguration];
-  }
 
-  [_videoWriter addInput:_videoWriterInput];
 
-  [_captureVideoOutput setSampleBufferDelegate:self queue:_dispatchQueue];
+        NSParameterAssert(_videoWriterInput);
+        CGFloat rotationDegrees;
+        if (_lockedCaptureOrientation != UIDeviceOrientationUnknown) {
+            rotationDegrees = [self getRotationFromDeviceOrientation:_lockedCaptureOrientation];
+        } else {
+            rotationDegrees = [self getRotationFromDeviceOrientation:[UIDevice currentDevice].orientation];
+        }
 
-  return YES;
+        _videoWriterInput.transform = CGAffineTransformMakeRotation(rotationDegrees * M_PI / 180);
+        _videoWriterInput.expectsMediaDataInRealTime = YES;
+
+        // Add the audio input
+        if (_enableAudio) {
+            AudioChannelLayout acl;
+            bzero(&acl, sizeof(acl));
+            acl.mChannelLayoutTag = kAudioChannelLayoutTag_Mono;
+            NSDictionary *audioOutputSettings = nil;
+            // Both type of audio inputs causes output video file to be corrupted.
+            audioOutputSettings = [NSDictionary
+                                   dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:kAudioFormatMPEG4AAC], AVFormatIDKey,
+                                   [NSNumber numberWithFloat:44100.0], AVSampleRateKey,
+                                   [NSNumber numberWithInt:1], AVNumberOfChannelsKey,
+                                   [NSData dataWithBytes:&acl length:sizeof(acl)],
+                                   AVChannelLayoutKey, nil];
+            _audioWriterInput = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeAudio
+                                                                   outputSettings:audioOutputSettings];
+            _audioWriterInput.expectsMediaDataInRealTime = YES;
+
+            [_videoWriter addInput:_audioWriterInput];
+            [_audioOutput setSampleBufferDelegate:self queue:_dispatchQueue];
+        }
+
+        if (_flashMode == FlashModeTorch) {
+            [self.captureDevice lockForConfiguration:nil];
+            [self.captureDevice setTorchMode:AVCaptureTorchModeOn];
+            [self.captureDevice unlockForConfiguration];
+        }
+
+        [_videoWriter addInput:_videoWriterInput];
+
+        [_captureVideoOutput setSampleBufferDelegate:self queue:_dispatchQueue];
+
+        return YES;
+    }
+    else {
+
+        NSDictionary *videoCompressSettings = [ NSDictionary dictionaryWithObject: [NSNumber numberWithDouble:1.0]
+                                                                       forKey: AVVideoQualityKey ];
+        videoSettings = [NSDictionary
+                           dictionaryWithObjectsAndKeys: AVVideoCodecJPEG, AVVideoCodecKey,
+                           videoCompressSettings, AVVideoCompressionPropertiesKey,
+                           [NSNumber numberWithInt:_previewSize.width], AVVideoWidthKey,
+                           [NSNumber numberWithInt:_previewSize.height], AVVideoHeightKey,
+                           nil];
+        _videoWriterInput = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeVideo
+                                                                   outputSettings:videoSettings];
+
+
+        _videoAdaptor = [AVAssetWriterInputPixelBufferAdaptor
+                         assetWriterInputPixelBufferAdaptorWithAssetWriterInput:_videoWriterInput
+                         sourcePixelBufferAttributes:@{
+                             (NSString *)kCVPixelBufferPixelFormatTypeKey : @(videoFormat)
+                         }];
+
+
+
+
+        //NSParameterAssert(_videoWriterInput);
+        CGFloat rotationDegrees;
+        if (_lockedCaptureOrientation != UIDeviceOrientationUnknown) {
+            rotationDegrees = [self getRotationFromDeviceOrientation:_lockedCaptureOrientation];
+        } else {
+            rotationDegrees = [self getRotationFromDeviceOrientation:[UIDevice currentDevice].orientation];
+        }
+
+        _videoWriterInput.transform = CGAffineTransformMakeRotation(rotationDegrees * M_PI / 180);
+        _videoWriterInput.expectsMediaDataInRealTime = YES;
+
+        // Add the audio input
+        if (_enableAudio) {
+            AudioChannelLayout acl;
+            bzero(&acl, sizeof(acl));
+            acl.mChannelLayoutTag = kAudioChannelLayoutTag_Mono;
+            NSDictionary *audioOutputSettings = nil;
+            // Both type of audio inputs causes output video file to be corrupted.
+            audioOutputSettings = [NSDictionary
+                                   dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:kAudioFormatMPEG4AAC], AVFormatIDKey,
+                                   [NSNumber numberWithFloat:44100.0], AVSampleRateKey,
+                                   [NSNumber numberWithInt:1], AVNumberOfChannelsKey,
+                                   [NSData dataWithBytes:&acl length:sizeof(acl)],
+                                   AVChannelLayoutKey, nil];
+            _audioWriterInput = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeAudio
+                                                                   outputSettings:audioOutputSettings];
+            _audioWriterInput.expectsMediaDataInRealTime = YES;
+
+            [_videoWriter addInput:_audioWriterInput];
+            [_audioOutput setSampleBufferDelegate:self queue:_dispatchQueue];
+        }
+
+        if (_flashMode == FlashModeTorch) {
+            [self.captureDevice lockForConfiguration:nil];
+            [self.captureDevice setTorchMode:AVCaptureTorchModeOn];
+            [self.captureDevice unlockForConfiguration];
+        }
+
+        [_videoWriter addInput:_videoWriterInput];
+
+        [_captureVideoOutput setSampleBufferDelegate:self queue:_dispatchQueue];
+
+        return YES;
+    }
+
+
 }
 
 - (void)setUpCaptureSessionForAudio {

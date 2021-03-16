@@ -1224,8 +1224,12 @@ static WhiteBalanceMode getWhiteBalanceModeForString(NSString *mode) {
     NSDictionary *videoSettings;
 
     if(isCompressed) {
+        NSDictionary *videoCompressSettings = [ NSDictionary dictionaryWithObject: [NSNumber numberWithDouble:0.5]
+        forKey: AVVideoQualityKey ];
+        
         videoSettings = [NSDictionary
                            dictionaryWithObjectsAndKeys:AVVideoCodecTypeH264, AVVideoCodecKey,
+                           videoCompressSettings, AVVideoCompressionPropertiesKey,
                            [NSNumber numberWithInt:_previewSize.width], AVVideoWidthKey,
                            [NSNumber numberWithInt:_previewSize.height], AVVideoHeightKey,
                            nil];

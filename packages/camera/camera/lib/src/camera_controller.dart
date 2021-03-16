@@ -147,6 +147,7 @@ class CameraValue {
     bool isRecordingPaused,
     FlashMode flashMode,
     ExposureMode exposureMode,
+    WhiteBalanceMode whiteBalanceMode,
     FocusMode focusMode,
     bool exposurePointSupported,
     bool focusPointSupported,
@@ -567,6 +568,16 @@ class CameraController extends ValueNotifier<CameraValue> {
     try {
       await CameraPlatform.instance.setExposureMode(_cameraId, mode);
       value = value.copyWith(exposureMode: mode);
+    } on PlatformException catch (e) {
+      throw CameraException(e.code, e.message);
+    }
+  }
+
+  /// Sets the white balance mode for taking pictures.
+  Future<void> setWhiteBalanceMode(WhiteBalanceMode mode) async {
+    try {
+      await CameraPlatform.instance.setWhiteBalanceMode(_cameraId, mode);
+      value = value.copyWith(whiteBalanceMode: mode);
     } on PlatformException catch (e) {
       throw CameraException(e.code, e.message);
     }

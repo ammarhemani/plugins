@@ -15,6 +15,7 @@ import 'package:cross_file/cross_file.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
+import '../types/white_balance_mode.dart';
 
 /// The interface that implementations of camera must implement.
 ///
@@ -62,8 +63,7 @@ abstract class CameraPlatform extends PlatformInterface {
   /// [imageFormatGroup] is used to specify the image formatting used.
   /// On Android this defaults to ImageFormat.YUV_420_888 and applies only to the imageStream.
   /// On iOS this defaults to kCVPixelFormatType_32BGRA.
-  Future<void> initializeCamera(int cameraId,
-      {ImageFormatGroup imageFormatGroup}) {
+  Future<void> initializeCamera(int cameraId, {ImageFormatGroup imageFormatGroup}) {
     throw UnimplementedError('initializeCamera() is not implemented.');
   }
 
@@ -93,13 +93,11 @@ abstract class CameraPlatform extends PlatformInterface {
   /// - Should support all 4 orientations.
   /// - Should not emit new values when the screen orientation is locked.
   Stream<DeviceOrientationChangedEvent> onDeviceOrientationChanged() {
-    throw UnimplementedError(
-        'onDeviceOrientationChanged() is not implemented.');
+    throw UnimplementedError('onDeviceOrientationChanged() is not implemented.');
   }
 
   /// Locks the capture orientation.
-  Future<void> lockCaptureOrientation(
-      int cameraId, DeviceOrientation orientation) {
+  Future<void> lockCaptureOrientation(int cameraId, DeviceOrientation orientation) {
     throw UnimplementedError('lockCaptureOrientation() is not implemented.');
   }
 
@@ -151,6 +149,11 @@ abstract class CameraPlatform extends PlatformInterface {
   /// Sets the exposure mode for taking pictures.
   Future<void> setExposureMode(int cameraId, ExposureMode mode) {
     throw UnimplementedError('setExposureMode() is not implemented.');
+  }
+
+  /// Sets the white balance mode for taking pictures.
+  Future<void> setWhiteBalanceMode(int cameraId, WhiteBalanceMode mode) {
+    throw UnimplementedError('setWhiteBalanceMode() is not implemented.');
   }
 
   /// Sets the exposure point for automatically determining the exposure values.

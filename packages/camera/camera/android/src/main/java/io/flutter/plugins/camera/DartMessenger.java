@@ -61,12 +61,14 @@ class DartMessenger {
       Integer previewWidth,
       Integer previewHeight,
       ExposureMode exposureMode,
+      WhiteBalanceMode whiteBalanceMode,
       FocusMode focusMode,
       Boolean exposurePointSupported,
       Boolean focusPointSupported) {
     assert (previewWidth != null);
     assert (previewHeight != null);
     assert (exposureMode != null);
+    assert (whiteBalanceMode != null);
     assert (focusMode != null);
     assert (exposurePointSupported != null);
     assert (focusPointSupported != null);
@@ -77,6 +79,7 @@ class DartMessenger {
             put("previewWidth", previewWidth.doubleValue());
             put("previewHeight", previewHeight.doubleValue());
             put("exposureMode", exposureMode.toString());
+            put("whiteBalanceMode", whiteBalanceMode.toString());
             put("focusMode", focusMode.toString());
             put("exposurePointSupported", exposurePointSupported);
             put("focusPointSupported", focusPointSupported);

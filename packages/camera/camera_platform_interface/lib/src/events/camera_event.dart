@@ -32,11 +32,7 @@ abstract class CameraEvent {
   CameraEvent(this.cameraId) : assert(cameraId != null);
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is CameraEvent &&
-          runtimeType == other.runtimeType &&
-          cameraId == other.cameraId;
+  bool operator ==(Object other) => identical(this, other) || other is CameraEvent && runtimeType == other.runtimeType && cameraId == other.cameraId;
 
   @override
   int get hashCode => cameraId.hashCode;
@@ -52,6 +48,9 @@ class CameraInitializedEvent extends CameraEvent {
 
   /// The default exposure mode
   final ExposureMode exposureMode;
+
+  /// The default white balance mode
+  final WhiteBalanceMode whiteBalanceMode;
 
   /// The default focus mode
   final FocusMode focusMode;
@@ -72,6 +71,7 @@ class CameraInitializedEvent extends CameraEvent {
     this.previewWidth,
     this.previewHeight, [
     this.exposureMode,
+    this.whiteBalanceMode,
     this.exposurePointSupported = false,
     this.focusMode,
     this.focusPointSupported = false,
@@ -83,6 +83,7 @@ class CameraInitializedEvent extends CameraEvent {
       : previewWidth = json['previewWidth'],
         previewHeight = json['previewHeight'],
         exposureMode = deserializeExposureMode(json['exposureMode']),
+        whiteBalanceMode = deserializeWhiteBalanceMode(json['whiteBalanceMode']),
         exposurePointSupported = json['exposurePointSupported'] ?? false,
         focusMode = deserializeFocusMode(json['focusMode']),
         focusPointSupported = json['focusPointSupported'] ?? false,
@@ -95,6 +96,7 @@ class CameraInitializedEvent extends CameraEvent {
         'previewWidth': previewWidth,
         'previewHeight': previewHeight,
         'exposureMode': serializeExposureMode(exposureMode),
+        'whiteBalanceMode': serializeWhiteBalanceMode(whiteBalanceMode),
         'exposurePointSupported': exposurePointSupported,
         'focusMode': serializeFocusMode(focusMode),
         'focusPointSupported': focusPointSupported,
@@ -109,6 +111,7 @@ class CameraInitializedEvent extends CameraEvent {
           previewWidth == other.previewWidth &&
           previewHeight == other.previewHeight &&
           exposureMode == other.exposureMode &&
+          whiteBalanceMode == other.whiteBalanceMode &&
           exposurePointSupported == other.exposurePointSupported &&
           focusMode == other.focusMode &&
           focusPointSupported == other.focusPointSupported;
@@ -119,6 +122,7 @@ class CameraInitializedEvent extends CameraEvent {
       previewWidth.hashCode ^
       previewHeight.hashCode ^
       exposureMode.hashCode ^
+      whiteBalanceMode.hashCode ^
       exposurePointSupported.hashCode ^
       focusMode.hashCode ^
       focusPointSupported.hashCode;
@@ -168,8 +172,7 @@ class CameraResolutionChangedEvent extends CameraEvent {
           captureHeight == other.captureHeight;
 
   @override
-  int get hashCode =>
-      super.hashCode ^ captureWidth.hashCode ^ captureHeight.hashCode;
+  int get hashCode => super.hashCode ^ captureWidth.hashCode ^ captureHeight.hashCode;
 }
 
 /// An event fired when the camera is going to close.
@@ -180,8 +183,7 @@ class CameraClosingEvent extends CameraEvent {
 
   /// Converts the supplied [Map] to an instance of the [CameraClosingEvent]
   /// class.
-  CameraClosingEvent.fromJson(Map<String, dynamic> json)
-      : super(json['cameraId']);
+  CameraClosingEvent.fromJson(Map<String, dynamic> json) : super(json['cameraId']);
 
   /// Converts the [CameraClosingEvent] instance into a [Map] instance that can
   /// be serialized to JSON.
@@ -190,11 +192,7 @@ class CameraClosingEvent extends CameraEvent {
       };
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      super == (other) &&
-          other is CameraClosingEvent &&
-          runtimeType == other.runtimeType;
+  bool operator ==(Object other) => identical(this, other) || super == (other) && other is CameraClosingEvent && runtimeType == other.runtimeType;
 
   @override
   int get hashCode => super.hashCode;
@@ -226,11 +224,7 @@ class CameraErrorEvent extends CameraEvent {
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) ||
-      super == (other) &&
-          other is CameraErrorEvent &&
-          runtimeType == other.runtimeType &&
-          description == other.description;
+      identical(this, other) || super == (other) && other is CameraErrorEvent && runtimeType == other.runtimeType && description == other.description;
 
   @override
   int get hashCode => super.hashCode ^ description.hashCode;

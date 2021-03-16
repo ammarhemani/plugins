@@ -301,6 +301,13 @@ static ResolutionPreset getResolutionPresetForString(NSString *preset) {
   }
 }
 
+typedef enum {
+    WhiteBalanceModeAutoWhiteBalance,
+    WhiteBalanceLocked,
+    WhiteBalanceContinuousWhiteBalance
+
+} WhiteBalanceMode;
+
 @interface FLTCam : NSObject <FlutterTexture,
                               AVCaptureVideoDataOutputSampleBufferDelegate,
                               AVCaptureAudioDataOutputSampleBufferDelegate>
@@ -332,6 +339,7 @@ static ResolutionPreset getResolutionPresetForString(NSString *preset) {
 @property(assign, nonatomic) BOOL isStreamingImages;
 @property(assign, nonatomic) ResolutionPreset resolutionPreset;
 @property(assign, nonatomic) ExposureMode exposureMode;
+@property(assign, nonatomic) WhiteBalanceMode whiteBalanceMode;
 @property(assign, nonatomic) FocusMode focusMode;
 @property(assign, nonatomic) FlashMode flashMode;
 @property(assign, nonatomic) UIDeviceOrientation lockedCaptureOrientation;
@@ -368,6 +376,7 @@ NSString *const errorMethod = @"error";
   _captureDevice = [AVCaptureDevice deviceWithUniqueID:cameraName];
   _flashMode = _captureDevice.hasFlash ? FlashModeAuto : FlashModeOff;
   _exposureMode = ExposureModeAuto;
+  _whiteBalanceMode = WhiteBalanceModeAutoWhiteBalance;
   _focusMode = FocusModeAuto;
   _lockedCaptureOrientation = UIDeviceOrientationUnknown;
 
@@ -1441,6 +1450,7 @@ static WhiteBalanceMode getWhiteBalanceModeForString(NSString *mode) {
                @"previewWidth" : @(_camera.previewSize.width),
                @"previewHeight" : @(_camera.previewSize.height),
                @"exposureMode" : getStringForExposureMode([_camera exposureMode]),
+               @"whiteBalanceMode" : getStringForWhiteBalanceMode([_camera whiteBalanceMode]),
                @"focusMode" : getStringForFocusMode([_camera focusMode]),
                @"exposurePointSupported" :
                    @([_camera.captureDevice isExposurePointOfInterestSupported]),

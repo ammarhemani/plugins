@@ -1563,7 +1563,7 @@ static WhiteBalanceMode getWhiteBalanceModeForString(NSString *mode) {
                @"previewHeight" : @(_camera.previewSize.height),
                @"exposureMode" : getStringForExposureMode([_camera exposureMode]),
                @"whiteBalanceMode" : getStringForWhiteBalanceMode([_camera whiteBalanceMode]),
-               @"avVideoQuality" : [_camera avVideoQuality],
+               @"avVideoQuality" : @([_camera avVideoQuality]),
                @"focusMode" : getStringForFocusMode([_camera focusMode]),
                @"exposurePointSupported" :
                    @([_camera.captureDevice isExposurePointOfInterestSupported]),

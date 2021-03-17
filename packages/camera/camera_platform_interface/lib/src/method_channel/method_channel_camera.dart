@@ -417,6 +417,7 @@ class MethodChannelCamera extends CameraPlatform {
           call.arguments['previewHeight'],
           deserializeExposureMode(call.arguments['exposureMode']),
           deserializeWhiteBalanceMode(call.arguments['whiteBalanceMode']),
+          call.arguments['avVideoQuality'],
           call.arguments['exposurePointSupported'],
           deserializeFocusMode(call.arguments['focusMode']),
           call.arguments['focusPointSupported'],

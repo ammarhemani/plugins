@@ -52,6 +52,9 @@ class CameraInitializedEvent extends CameraEvent {
   /// The default white balance mode
   final WhiteBalanceMode whiteBalanceMode;
 
+  /// The default AvVideoQuality
+  final double avVideoQuality;
+
   /// The default focus mode
   final FocusMode focusMode;
 
@@ -72,6 +75,7 @@ class CameraInitializedEvent extends CameraEvent {
     this.previewHeight, [
     this.exposureMode,
     this.whiteBalanceMode,
+    this.avVideoQuality,
     this.exposurePointSupported = false,
     this.focusMode,
     this.focusPointSupported = false,
@@ -84,6 +88,7 @@ class CameraInitializedEvent extends CameraEvent {
         previewHeight = json['previewHeight'],
         exposureMode = deserializeExposureMode(json['exposureMode']),
         whiteBalanceMode = deserializeWhiteBalanceMode(json['whiteBalanceMode']),
+        avVideoQuality = json["avVideoQuality"],
         exposurePointSupported = json['exposurePointSupported'] ?? false,
         focusMode = deserializeFocusMode(json['focusMode']),
         focusPointSupported = json['focusPointSupported'] ?? false,
@@ -97,6 +102,7 @@ class CameraInitializedEvent extends CameraEvent {
         'previewHeight': previewHeight,
         'exposureMode': serializeExposureMode(exposureMode),
         'whiteBalanceMode': serializeWhiteBalanceMode(whiteBalanceMode),
+        'avVideoQuality': avVideoQuality,
         'exposurePointSupported': exposurePointSupported,
         'focusMode': serializeFocusMode(focusMode),
         'focusPointSupported': focusPointSupported,
@@ -112,6 +118,7 @@ class CameraInitializedEvent extends CameraEvent {
           previewHeight == other.previewHeight &&
           exposureMode == other.exposureMode &&
           whiteBalanceMode == other.whiteBalanceMode &&
+          avVideoQuality == other.avVideoQuality &&
           exposurePointSupported == other.exposurePointSupported &&
           focusMode == other.focusMode &&
           focusPointSupported == other.focusPointSupported;
@@ -123,6 +130,7 @@ class CameraInitializedEvent extends CameraEvent {
       previewHeight.hashCode ^
       exposureMode.hashCode ^
       whiteBalanceMode.hashCode ^
+      avVideoQuality.hashCode ^
       exposurePointSupported.hashCode ^
       focusMode.hashCode ^
       focusPointSupported.hashCode;

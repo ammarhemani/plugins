@@ -289,6 +289,15 @@ class MethodChannelCamera extends CameraPlatform {
       );
 
   @override
+  Future<double> setAVVideoQuality(int cameraId, double value) => _channel.invokeMethod<double>(
+        'setAVVideoQuality',
+        <String, dynamic>{
+          'cameraId': cameraId,
+          'value': value,
+        },
+      );
+
+  @override
   Future<void> setFocusMode(int cameraId, FocusMode mode) => _channel.invokeMethod<void>(
         'setFocusMode',
         <String, dynamic>{

@@ -193,6 +193,15 @@ abstract class CameraPlatform extends PlatformInterface {
     throw UnimplementedError('setExposureOffset() is not implemented.');
   }
 
+  /// Sets the AvVideoQualityKey in AVFoundation for the selected camera. (iOS only.)
+  ///
+  /// The supplied [value] value should be between 0.0 and 1.0.
+  /// Throws a `CameraException` when an illegal value is supplied.
+  ///
+  Future<double> setAVVideoQuality(int cameraId, double value) {
+    throw UnimplementedError('setAVVideoQuality() is not implemented.');
+  }
+
   /// Sets the focus mode for taking pictures.
   Future<void> setFocusMode(int cameraId, FocusMode mode) {
     throw UnimplementedError('setFocusMode() is not implemented.');

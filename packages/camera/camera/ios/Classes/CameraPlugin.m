@@ -339,6 +339,7 @@ typedef enum {
 @property(assign, nonatomic) BOOL isStreamingImages;
 @property(assign, nonatomic) ResolutionPreset resolutionPreset;
 @property(assign, nonatomic) ExposureMode exposureMode;
+@property(assign, nonatomic) double avVideoQuality;
 @property(assign, nonatomic) WhiteBalanceMode whiteBalanceMode;
 @property(assign, nonatomic) FocusMode focusMode;
 @property(assign, nonatomic) FlashMode flashMode;
@@ -375,7 +376,7 @@ NSString *const errorMethod = @"error";
   _captureSession = [[AVCaptureSession alloc] init];
   _captureDevice = [AVCaptureDevice deviceWithUniqueID:cameraName];
   _flashMode = _captureDevice.hasFlash ? FlashModeAuto : FlashModeOff;
-    _avVideoQuality = 1.0;
+  _avVideoQuality = 1.0;
   _exposureMode = ExposureModeAuto;
   _whiteBalanceMode = WhiteBalanceModeAutoWhiteBalance;
   _focusMode = FocusModeAuto;
@@ -1117,7 +1118,7 @@ static WhiteBalanceMode getWhiteBalanceModeForString(NSString *mode) {
 }
 
 - (void)setAVVideoQualityWithResult:(FlutterResult)result value:(double)value {
-    _avVideoQuality = value;
+  _avVideoQuality = value;
   result(@(value));
 }
 
@@ -1562,6 +1563,7 @@ static WhiteBalanceMode getWhiteBalanceModeForString(NSString *mode) {
                @"previewHeight" : @(_camera.previewSize.height),
                @"exposureMode" : getStringForExposureMode([_camera exposureMode]),
                @"whiteBalanceMode" : getStringForWhiteBalanceMode([_camera whiteBalanceMode]),
+               @"avVideoQuality" : [_camera avVideoQuality],
                @"focusMode" : getStringForFocusMode([_camera focusMode]),
                @"exposurePointSupported" :
                    @([_camera.captureDevice isExposurePointOfInterestSupported]),

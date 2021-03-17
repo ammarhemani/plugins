@@ -375,6 +375,7 @@ NSString *const errorMethod = @"error";
   _captureSession = [[AVCaptureSession alloc] init];
   _captureDevice = [AVCaptureDevice deviceWithUniqueID:cameraName];
   _flashMode = _captureDevice.hasFlash ? FlashModeAuto : FlashModeOff;
+    _avVideoQuality = 1.0;
   _exposureMode = ExposureModeAuto;
   _whiteBalanceMode = WhiteBalanceModeAutoWhiteBalance;
   _focusMode = FocusModeAuto;
@@ -1115,6 +1116,11 @@ static WhiteBalanceMode getWhiteBalanceModeForString(NSString *mode) {
   result(@(offset));
 }
 
+- (void)setAVVideoQualityWithResult:(FlutterResult)result value:(double)value {
+    _avVideoQuality = value;
+  result(@(value));
+}
+
 - (void)startImageStreamWithMessenger:(NSObject<FlutterBinaryMessenger> *)messenger {
   if (!_isStreamingImages) {
     FlutterEventChannel *eventChannel =
@@ -1224,7 +1230,7 @@ static WhiteBalanceMode getWhiteBalanceModeForString(NSString *mode) {
     NSDictionary *videoSettings;
 
     if(isCompressed) {
-        NSDictionary *videoCompressSettings = [ NSDictionary dictionaryWithObject: [NSNumber numberWithDouble:0.5]
+        NSDictionary *videoCompressSettings = [ NSDictionary dictionaryWithObject: [NSNumber numberWithDouble:_avVideoQuality]
         forKey: AVVideoQualityKey ];
         
         videoSettings = [NSDictionary
@@ -1617,7 +1623,10 @@ static WhiteBalanceMode getWhiteBalanceModeForString(NSString *mode) {
     } else if ([@"setExposureOffset" isEqualToString:call.method]) {
       [_camera setExposureOffsetWithResult:result
                                     offset:((NSNumber *)call.arguments[@"offset"]).doubleValue];
-    } else if ([@"lockCaptureOrientation" isEqualToString:call.method]) {
+    } else if ([@"setAVVideoQuality" isEqualToString:call.method]) {
+      [_camera setAVVideoQualityWithResult:result
+                                    value:((NSNumber *)call.arguments[@"value"]).doubleValue];
+    }else if ([@"lockCaptureOrientation" isEqualToString:call.method]) {
       [_camera lockCaptureOrientationWithResult:result orientation:call.arguments[@"orientation"]];
     } else if ([@"unlockCaptureOrientation" isEqualToString:call.method]) {
       [_camera unlockCaptureOrientationWithResult:result];

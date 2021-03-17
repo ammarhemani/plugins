@@ -677,6 +677,29 @@ class CameraController extends ValueNotifier<CameraValue> {
     }
   }
 
+  /// Sets the AvVideoQualityKey in AVFoundation for the selected camera. (iOS only.)
+  ///
+  /// The supplied [offset] value should be between 0.0 and 1.0.
+  /// Throws a `CameraException` when an illegal value is supplied.
+  ///
+  Future<double> setAVVideoQuality(double value) async {
+    _throwIfNotInitialized("setAVVideoQuality");
+    // Check if offset is in range
+    List<double> range = [0.0, 1.0];
+    if (value < range[0] || value > range[1]) {
+      throw CameraException(
+        "valueOutOfBounds",
+        "The provided value was outside the supported range for AVVideoQuality",
+      );
+    }
+
+    try {
+      return CameraPlatform.instance.setAVVideoQuality(_cameraId, value);
+    } on PlatformException catch (e) {
+      throw CameraException(e.code, e.message);
+    }
+  }
+
   /// Locks the capture orientation.
   ///
   /// If [orientation] is omitted, the current device orientation is used.

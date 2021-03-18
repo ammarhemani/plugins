@@ -202,6 +202,14 @@ abstract class CameraPlatform extends PlatformInterface {
     throw UnimplementedError('setAVVideoQuality() is not implemented.');
   }
 
+  /// Sets the AvVideoAverageBitrateKey in AVFoundation for the selected camera. (iOS only.)
+  ///
+  /// Throws a `CameraException` when an illegal value is supplied.
+  ///
+  Future<double> setAVVideoAverageBitrate(int cameraId, int value) {
+    throw UnimplementedError('setAVVideoAverageBitrate() is not implemented.');
+  }
+
   /// Sets the focus mode for taking pictures.
   Future<void> setFocusMode(int cameraId, FocusMode mode) {
     throw UnimplementedError('setFocusMode() is not implemented.');

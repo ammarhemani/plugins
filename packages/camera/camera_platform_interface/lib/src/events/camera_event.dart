@@ -55,6 +55,9 @@ class CameraInitializedEvent extends CameraEvent {
   /// The default AvVideoQuality
   final double avVideoQuality;
 
+  /// The default AvVideoAverageBitrate
+  final double avVideoAverageBitrate;
+
   /// The default focus mode
   final FocusMode focusMode;
 
@@ -76,6 +79,7 @@ class CameraInitializedEvent extends CameraEvent {
     this.exposureMode,
     this.whiteBalanceMode,
     this.avVideoQuality,
+    this.avVideoAverageBitrate,
     this.exposurePointSupported = false,
     this.focusMode,
     this.focusPointSupported = false,
@@ -89,6 +93,7 @@ class CameraInitializedEvent extends CameraEvent {
         exposureMode = deserializeExposureMode(json['exposureMode']),
         whiteBalanceMode = deserializeWhiteBalanceMode(json['whiteBalanceMode']),
         avVideoQuality = json["avVideoQuality"],
+        avVideoAverageBitrate = json["avVideoAverageBitrate"],
         exposurePointSupported = json['exposurePointSupported'] ?? false,
         focusMode = deserializeFocusMode(json['focusMode']),
         focusPointSupported = json['focusPointSupported'] ?? false,
@@ -103,6 +108,7 @@ class CameraInitializedEvent extends CameraEvent {
         'exposureMode': serializeExposureMode(exposureMode),
         'whiteBalanceMode': serializeWhiteBalanceMode(whiteBalanceMode),
         'avVideoQuality': avVideoQuality,
+        'avVideoAverageBitrate': avVideoAverageBitrate,
         'exposurePointSupported': exposurePointSupported,
         'focusMode': serializeFocusMode(focusMode),
         'focusPointSupported': focusPointSupported,
@@ -119,6 +125,7 @@ class CameraInitializedEvent extends CameraEvent {
           exposureMode == other.exposureMode &&
           whiteBalanceMode == other.whiteBalanceMode &&
           avVideoQuality == other.avVideoQuality &&
+          avVideoAverageBitrate == other.avVideoAverageBitrate &&
           exposurePointSupported == other.exposurePointSupported &&
           focusMode == other.focusMode &&
           focusPointSupported == other.focusPointSupported;
@@ -131,6 +138,7 @@ class CameraInitializedEvent extends CameraEvent {
       exposureMode.hashCode ^
       whiteBalanceMode.hashCode ^
       avVideoQuality.hashCode ^
+      avVideoAverageBitrate.hashCode ^
       exposurePointSupported.hashCode ^
       focusMode.hashCode ^
       focusPointSupported.hashCode;

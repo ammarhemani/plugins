@@ -298,6 +298,15 @@ class MethodChannelCamera extends CameraPlatform {
       );
 
   @override
+  Future<int> setAVVideoAverageBitrate(int cameraId, int value) => _channel.invokeMethod<int>(
+        'setAVVideoAverageBitrate',
+        <String, dynamic>{
+          'cameraId': cameraId,
+          'value': value,
+        },
+      );
+
+  @override
   Future<void> setFocusMode(int cameraId, FocusMode mode) => _channel.invokeMethod<void>(
         'setFocusMode',
         <String, dynamic>{
@@ -418,6 +427,7 @@ class MethodChannelCamera extends CameraPlatform {
           deserializeExposureMode(call.arguments['exposureMode']),
           deserializeWhiteBalanceMode(call.arguments['whiteBalanceMode']),
           call.arguments['avVideoQuality'],
+          call.arguments['avVideoAverageBitrate'],
           call.arguments['exposurePointSupported'],
           deserializeFocusMode(call.arguments['focusMode']),
           call.arguments['focusPointSupported'],

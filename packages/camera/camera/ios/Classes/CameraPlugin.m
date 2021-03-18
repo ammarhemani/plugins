@@ -340,6 +340,7 @@ typedef enum {
 @property(assign, nonatomic) ResolutionPreset resolutionPreset;
 @property(assign, nonatomic) ExposureMode exposureMode;
 @property(assign, nonatomic) double avVideoQuality;
+@property(assign, nonatomic) int avVideoAverageBitrate;
 @property(assign, nonatomic) WhiteBalanceMode whiteBalanceMode;
 @property(assign, nonatomic) FocusMode focusMode;
 @property(assign, nonatomic) FlashMode flashMode;
@@ -377,6 +378,7 @@ NSString *const errorMethod = @"error";
   _captureDevice = [AVCaptureDevice deviceWithUniqueID:cameraName];
   _flashMode = _captureDevice.hasFlash ? FlashModeAuto : FlashModeOff;
   _avVideoQuality = 1.0;
+  _avVideoAverageBitrate = 20000;
   _exposureMode = ExposureModeAuto;
   _whiteBalanceMode = WhiteBalanceModeAutoWhiteBalance;
   _focusMode = FocusModeAuto;
@@ -1122,6 +1124,11 @@ static WhiteBalanceMode getWhiteBalanceModeForString(NSString *mode) {
   result(@(value));
 }
 
+- (void)setAVVideoAverageBitrateWithResult:(FlutterResult)result value:(int)value {
+  _avVideoAverageBitrate = value;
+  result(@(value));
+}
+
 - (void)startImageStreamWithMessenger:(NSObject<FlutterBinaryMessenger> *)messenger {
   if (!_isStreamingImages) {
     FlutterEventChannel *eventChannel =
@@ -1564,6 +1571,7 @@ static WhiteBalanceMode getWhiteBalanceModeForString(NSString *mode) {
                @"exposureMode" : getStringForExposureMode([_camera exposureMode]),
                @"whiteBalanceMode" : getStringForWhiteBalanceMode([_camera whiteBalanceMode]),
                @"avVideoQuality" : @([_camera avVideoQuality]),
+               @"avVideoAverageBitrate" : @([_camera avVideoAverageBitrate]),
                @"focusMode" : getStringForFocusMode([_camera focusMode]),
                @"exposurePointSupported" :
                    @([_camera.captureDevice isExposurePointOfInterestSupported]),
@@ -1628,7 +1636,11 @@ static WhiteBalanceMode getWhiteBalanceModeForString(NSString *mode) {
     } else if ([@"setAVVideoQuality" isEqualToString:call.method]) {
       [_camera setAVVideoQualityWithResult:result
                                     value:((NSNumber *)call.arguments[@"value"]).doubleValue];
-    }else if ([@"lockCaptureOrientation" isEqualToString:call.method]) {
+    }
+    else if ([@"setAVVideoAverageBitrate" isEqualToString:call.method]) {
+          [_camera setAVVideoAverageBitrateWithResult:result
+                                        value:((NSNumber *)call.arguments[@"value"]).intValue];
+        }else if ([@"lockCaptureOrientation" isEqualToString:call.method]) {
       [_camera lockCaptureOrientationWithResult:result orientation:call.arguments[@"orientation"]];
     } else if ([@"unlockCaptureOrientation" isEqualToString:call.method]) {
       [_camera unlockCaptureOrientationWithResult:result];

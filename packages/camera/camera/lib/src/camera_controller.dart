@@ -679,7 +679,7 @@ class CameraController extends ValueNotifier<CameraValue> {
 
   /// Sets the AvVideoQualityKey in AVFoundation for the selected camera. (iOS only.)
   ///
-  /// The supplied [offset] value should be between 0.0 and 1.0.
+  /// The supplied [value] value should be between 0.0 and 1.0.
   /// Throws a `CameraException` when an illegal value is supplied.
   ///
   Future<double> setAVVideoQuality(double value) async {
@@ -695,6 +695,20 @@ class CameraController extends ValueNotifier<CameraValue> {
 
     try {
       return CameraPlatform.instance.setAVVideoQuality(_cameraId, value);
+    } on PlatformException catch (e) {
+      throw CameraException(e.code, e.message);
+    }
+  }
+
+  /// Sets the AvVideoAverageBitrateKey in AVFoundation for the selected camera. (iOS only.)
+  ///
+  /// Throws a `CameraException` when an illegal value is supplied.
+  ///
+  Future<double> setAVVideoAverageBitrate(int value) async {
+    _throwIfNotInitialized("setAVVideoAverageBitrate");
+
+    try {
+      return CameraPlatform.instance.setAVVideoAverageBitrate(_cameraId, value);
     } on PlatformException catch (e) {
       throw CameraException(e.code, e.message);
     }

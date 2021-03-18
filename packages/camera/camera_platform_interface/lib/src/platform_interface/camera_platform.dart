@@ -206,7 +206,7 @@ abstract class CameraPlatform extends PlatformInterface {
   ///
   /// Throws a `CameraException` when an illegal value is supplied.
   ///
-  Future<double> setAVVideoAverageBitrate(int cameraId, int value) {
+  Future<int> setAVVideoAverageBitrate(int cameraId, int value) {
     throw UnimplementedError('setAVVideoAverageBitrate() is not implemented.');
   }
 

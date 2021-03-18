@@ -1636,11 +1636,10 @@ static WhiteBalanceMode getWhiteBalanceModeForString(NSString *mode) {
     } else if ([@"setAVVideoQuality" isEqualToString:call.method]) {
       [_camera setAVVideoQualityWithResult:result
                                     value:((NSNumber *)call.arguments[@"value"]).doubleValue];
-    }
-    else if ([@"setAVVideoAverageBitrate" isEqualToString:call.method]) {
-          [_camera setAVVideoAverageBitrateWithResult:result
-                                        value:((NSNumber *)call.arguments[@"value"]).intValue];
-        }else if ([@"lockCaptureOrientation" isEqualToString:call.method]) {
+    } else if ([@"setAVVideoAverageBitrate" isEqualToString:call.method]) {
+      [_camera setAVVideoAverageBitrateWithResult:result
+                                    value:((NSNumber *)call.arguments[@"value"]).intValue];
+    } else if ([@"lockCaptureOrientation" isEqualToString:call.method]) {
       [_camera lockCaptureOrientationWithResult:result orientation:call.arguments[@"orientation"]];
     } else if ([@"unlockCaptureOrientation" isEqualToString:call.method]) {
       [_camera unlockCaptureOrientationWithResult:result];

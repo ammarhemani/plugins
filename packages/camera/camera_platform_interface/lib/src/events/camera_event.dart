@@ -56,7 +56,7 @@ class CameraInitializedEvent extends CameraEvent {
   final double avVideoQuality;
 
   /// The default AvVideoAverageBitrate
-  final double avVideoAverageBitrate;
+  final int avVideoAverageBitrate;
 
   /// The default focus mode
   final FocusMode focusMode;

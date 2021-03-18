@@ -704,7 +704,7 @@ class CameraController extends ValueNotifier<CameraValue> {
   ///
   /// Throws a `CameraException` when an illegal value is supplied.
   ///
-  Future<double> setAVVideoAverageBitrate(int value) async {
+  Future<int> setAVVideoAverageBitrate(int value) async {
     _throwIfNotInitialized("setAVVideoAverageBitrate");
 
     try {

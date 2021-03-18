@@ -1,4 +1,4 @@
-package android.src.main.java.io.flutter.plugins.camera.types;
+package io.flutter.plugins.camera.types;
 
 
 public enum WhiteBalanceMode {

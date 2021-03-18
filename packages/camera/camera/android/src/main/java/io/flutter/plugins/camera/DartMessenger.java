@@ -13,6 +13,7 @@ import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugins.camera.types.ExposureMode;
 import io.flutter.plugins.camera.types.FocusMode;
+import io.flutter.plugins.camera.types.WhiteBalanceMode;
 import java.util.HashMap;
 import java.util.Map;
 

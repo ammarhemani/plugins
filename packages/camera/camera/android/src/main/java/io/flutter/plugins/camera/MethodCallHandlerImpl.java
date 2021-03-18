@@ -18,6 +18,7 @@ import io.flutter.plugins.camera.CameraPermissions.PermissionsRegistry;
 import io.flutter.plugins.camera.types.ExposureMode;
 import io.flutter.plugins.camera.types.FlashMode;
 import io.flutter.plugins.camera.types.FocusMode;
+import io.flutter.plugins.camera.types.WhiteBalanceMode;
 import io.flutter.view.TextureRegistry;
 import java.util.HashMap;
 import java.util.Map;
